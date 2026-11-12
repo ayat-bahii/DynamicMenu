@@ -4,6 +4,9 @@
 void gotoxy(int x, int y);
 void setColor(int color);
 void resetColor();
+char getch_linux();
+int choiceMenu();
+
 
 namespace Colors
 {
