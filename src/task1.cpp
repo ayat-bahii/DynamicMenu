@@ -1,6 +1,7 @@
 #include <iostream>
 #include "myterminal.h"
 #include "employees.h"
+#include "stack.h"
 
 using namespace std;
 
@@ -98,7 +99,8 @@ void viewMenu(){
             if(counter==1){
                 //enterEmployees(empList,5);
                 //enterEmployeeClass(empList2);
-                emplist3=enterEmployeesDynamic();
+                //emplist3=enterEmployeesDynamic();
+                addEmployeeStack();
                 inputData=true;
                 cout << "\033[2J\033[1;1H";
             }
@@ -107,7 +109,8 @@ void viewMenu(){
                 if(inputData){
                     //viewEmployees(empList);
                     //viewEmployeeClass(empList2);
-                    viewEmployeesDynamic(emplist3);
+                    //viewEmployeesDynamic(emplist3);
+                    displayStack();
                     cout << "\033[2J\033[1;1H";
                 }else{
                     cout << "\033[2J\033[1;1H";    
@@ -122,7 +125,6 @@ void viewMenu(){
         }
     
     }
-    delete[] emplist3;
     
 }
 

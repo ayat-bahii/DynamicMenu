@@ -56,5 +56,6 @@ void enterEmployeeClass(employee emp[]);
 void viewEmployeeClass(employee emp[]);
 employees* enterEmployeesDynamic();
 void viewEmployeesDynamic(employees* emp);
-
+void addEmployeeStack();
+void displayStack();
 #endif
