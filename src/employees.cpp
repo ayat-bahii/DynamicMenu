@@ -157,19 +157,31 @@ void viewEmployeeClass(employee emp[]){
 }
 
 int number=0;
-
-employees* enterEmployeesDynamic(){
+int capacity=2;
+int counter=0;
+employees* enterEmployeesDynamic(employees* emp){
     cout << "\033[2J\033[1;1H";
     cin.clear();
-    
+    if (emp == nullptr) {
+        emp = new employees[capacity];
+    }
     cout<<"How Many Employees ? ";
     cin>>number;
     while(number<=0){
         cout<<"Please Enter Positive number"<<"\n";
         cin>>number;
     }
-    employees* emp= new employees[number];
-    for(int i=0;i<number;i++){
+    int total=number+counter;
+    for(int i=counter;i<total;i++){
+        if(counter==capacity){
+            capacity*=2;
+            employees *ptr=new employees[capacity];
+            for(int j=0;j<counter;j++){
+                ptr[j]=emp[j];
+            }
+            delete[] emp;
+            emp=ptr;
+        }
         cout<<"Enter Employee name " <<i+1<< " : ";
         cin>>emp[i].name;
         while(!isValidName(emp[i].name)){
@@ -196,6 +208,7 @@ employees* enterEmployeesDynamic(){
             cout<<"Enter Valid Salary"<<"\n";
             cin>>emp[i].salary;
         }
+        counter++;
     }
     cout << "\n=========================================" << endl;
     cout<< "Press [Esc] to return to menu "<<flush;
@@ -214,7 +227,7 @@ void viewEmployeesDynamic(employees* emp){
     
     cout << "\033[2J\033[1;1H";
 
-    for(int i=0;i<number;i++){
+    for(int i=0;i<counter;i++){
 
         cout<<"========Employee"<<i+1<<"========="<<endl;
         cout<<"Name: "<<emp[i].name<<"\n";

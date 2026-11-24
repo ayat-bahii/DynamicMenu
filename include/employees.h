@@ -54,7 +54,7 @@ void enterEmployees(employees emp[],int size);
 void viewEmployees(employees emp[]);
 void enterEmployeeClass(employee emp[]);
 void viewEmployeeClass(employee emp[]);
-employees* enterEmployeesDynamic();
+employees* enterEmployeesDynamic(employees* emp);
 void viewEmployeesDynamic(employees* emp);
 void addEmployeeStack();
 void displayStack();

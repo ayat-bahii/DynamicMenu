@@ -99,7 +99,7 @@ void viewMenu(){
             if(counter==1){
                 //enterEmployees(empList,5);
                 //enterEmployeeClass(empList2);
-                //emplist3=enterEmployeesDynamic();
+                //emplist3=enterEmployeesDynamic(emplist3);
                 addEmployeeStack();
                 inputData=true;
                 cout << "\033[2J\033[1;1H";

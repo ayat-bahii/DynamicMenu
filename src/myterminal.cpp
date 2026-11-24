@@ -1,85 +1,85 @@
 #include <iostream>
-#include <unistd.h>   // Provides Unix functions such as read
-#include <termios.h>  // Used to control terminal settings
 #include "myterminal.h"
 
-char getch_linux() {
-    char buf = 0; // Variable to store the input character
-    struct termios old = {0}; // Structure to save current terminal settings
-    // Save the current terminal settings
-    tcgetattr(0, &old);
-    // Disable Canonical Mode (do not wait for Enter key)
-    old.c_lflag &= ~ICANON;
-    // Disable Echo so typed characters are not displayed
-    old.c_lflag &= ~ECHO;
-    // Require at least one character to be read
-    old.c_cc[VMIN] = 1;
-    // No timeout while waiting for input
-    old.c_cc[VTIME] = 0;
-    // Apply the modified settings immediately
-    tcsetattr(0, TCSANOW, &old);
-    // Read a single character immediately from the keyboard
-    read(0, &buf, 1);
-    // Re-enable Canonical Mode
-    old.c_lflag |= ICANON;
-    // Re-enable Echo
-    old.c_lflag |= ECHO;
-    // Restore the terminal to its original settings
-    tcsetattr(0, TCSADRAIN, &old);
-    // Return the character that was read
-    return buf;
-}
+#ifdef _WIN32
+    #include <conio.h>
+    #include <windows.h>
 
-void gotoxy(int x, int y)
-{
+    // Translates Windows arrow keys into Linux arrow keys
+    char getch_linux() {
+        // Enables ANSI colors and gotoxy on Windows automatically
+        static bool initialized = false;
+        if (!initialized) {
+            HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+            DWORD dwMode = 0;
+            GetConsoleMode(hOut, &dwMode);
+            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            SetConsoleMode(hOut, dwMode);
+            initialized = true;
+        }
 
-    std::cout << "\033[" << y << ";" << x << "H"; //ANSI Escape Sequence
+        static int step = 0;
+        static char savedArrow = 0;
+
+        // If an arrow key was pressed, feed '[' then 'A'/'B' on the next calls
+        if (step == 1) {
+            step = 2;
+            return '[';
+        }
+        if (step == 2) {
+            step = 0;
+            return savedArrow;
+        }
+
+        int ch = _getch();
+        if (ch == 0 || ch == 224) { // Windows arrow key prefix
+            int arrow = _getch();
+            if (arrow == 72) {      // Windows Up Arrow
+                step = 1;
+                savedArrow = 'A';
+                return '\033';
+            }
+            if (arrow == 80) {      // Windows Down Arrow
+                step = 1;
+                savedArrow = 'B';
+                return '\033';
+            }
+        }
+        return (char)ch;
+    }
+
+#else
+    #include <unistd.h>
+    #include <termios.h>
+
+    char getch_linux() {
+        char buf = 0;
+        struct termios old = {0};
+        tcgetattr(0, &old);
+        old.c_lflag &= ~ICANON;
+        old.c_lflag &= ~ECHO;
+        old.c_cc[VMIN] = 1;
+        old.c_cc[VTIME] = 0;
+        tcsetattr(0, TCSANOW, &old);
+        read(0, &buf, 1);
+        old.c_lflag |= ICANON;
+        old.c_lflag |= ECHO;
+        tcsetattr(0, TCSADRAIN, &old);
+        return buf;
+    }
+#endif
+
+void gotoxy(int x, int y) {
+    std::cout << "\033[" << y << ";" << x << "H";
     std::cout.flush();
 }
 
-void setColor(int color)
-{
+void setColor(int color) {
     std::cout << "\033[" << color << "m";
     std::cout.flush();
 }
 
-void resetColor()
-{
+void resetColor() {
     std::cout << "\033[0m";
     std::cout.flush();
 }
-
-// int choiceMenu(){
-//     char byte1='q';
-//     char byte2='q';
-//     char byte3='q';
-//     int counter =1;
-//     do{
-//         byte1= getch_linux();
-//         if (byte1 == '\033') {
-//             byte2=getch_linux();
-//             byte3=getch_linux();
-//             switch (byte3) {
-//                 case 'A':
-//                     if(counter=1){
-//                         counter=3;
-//                     }else{
-//                         counter--;
-//                     }
-//                     break;
-
-//                 case 'B':
-//                     if(counter==3){
-//                         counter=1;
-//                     }else{
-//                         counter++;
-//                     }
-//                     break;
-//             }
-//         }
-       
-//     }while(byte1 != 'q' && byte1 != 'Q'); 
-//     return counter;
-
-//     // Exit the program successfully
-// }
